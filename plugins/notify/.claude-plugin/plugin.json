@@ -1,0 +1,6 @@
+{
+  "name": "notify",
+  "version": "1.0.0",
+  "description": "macOS notifications with sound, topic summarization, and terminal activation when Claude Code finishes or needs input.",
+  "platforms": ["darwin"]
+}

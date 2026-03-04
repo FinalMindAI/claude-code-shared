@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    {
+      "name": "notify",
+      "path": "plugins/notify",
+      "description": "macOS notifications with sound, topic summarization, and terminal activation when Claude Code finishes or needs input."
+    }
+  ]
+}

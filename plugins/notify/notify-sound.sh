@@ -62,23 +62,27 @@ fi
 
 # Generate topic if not cached and enabled
 if [ -z "$TOPIC" ] && [ "$NOTIFY_TOPIC_ENABLED" = "true" ] && [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
-  # Extract first user message
+  # Extract first real user message (skip meta entries, commands, and tool results)
   FIRST_MSG=$(python3 -c "
 import json
 with open('$TRANSCRIPT') as f:
     for line in f:
         d = json.loads(line)
-        if d.get('type') == 'user':
-            msg = d.get('message', {})
-            content = msg.get('content', '') if isinstance(msg, dict) else str(msg)
-            if isinstance(content, str):
-                text = content.strip()
-            elif isinstance(content, list):
-                text = next((b['text'] for b in content if isinstance(b, dict) and b.get('type') == 'text'), '')
-            else:
-                text = ''
-            print(text[:200])
-            break
+        if d.get('type') != 'user' or d.get('isMeta'):
+            continue
+        msg = d.get('message', {})
+        content = msg.get('content', '') if isinstance(msg, dict) else str(msg)
+        # Skip tool-result messages (content is a list of tool_result dicts)
+        if isinstance(content, list):
+            continue
+        if not isinstance(content, str):
+            continue
+        text = content.strip()
+        # Skip slash commands and empty messages
+        if not text or text.startswith('<command-name>'):
+            continue
+        print(text[:200])
+        break
 " 2>/dev/null)
 
   if [ -n "$FIRST_MSG" ]; then
